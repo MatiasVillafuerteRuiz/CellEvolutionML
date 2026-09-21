@@ -1,0 +1,64 @@
+# ==========================================
+# UNITY
+# ==========================================
+
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+Recordings/
+
+# ==========================================
+# VISUAL STUDIO / IDE
+# ==========================================
+
+.vs/
+.vscode/
+.idea/
+
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# ==========================================
+# SISTEMA OPERATIVO
+# ==========================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# PYTHON
+# ==========================================
+
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+env/
+
+# ==========================================
+# ML-AGENTS - RESULTADOS DE ENTRENAMIENTO
+# ==========================================
+
+results/
+summaries/
+
+# ==========================================
+# ARCHIVOS TEMPORALES
+# ==========================================
+
+*.tmp
+*.bak
+*.log
