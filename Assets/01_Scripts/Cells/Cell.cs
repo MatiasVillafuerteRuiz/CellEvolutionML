@@ -69,7 +69,7 @@ public class Cell : MonoBehaviour
 
         spriteRenderer.color = cellColor;
     }
-    public void Eliminate()
+    public void Eliminate(string cause = "el jugador")
     {
         if (!isAlive)
             return;
@@ -85,7 +85,7 @@ public class Cell : MonoBehaviour
         }
 
         Debug.Log(
-            "Célula eliminada por el jugador."
+            "Célula eliminada por " + cause + "."
         );
 
         if (cellSpawner != null)

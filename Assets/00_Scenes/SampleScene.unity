@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f636a709ff861a0498f1c1f127fa67ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoundManager
-  roundDuration: 10
+  roundDuration: 3
   timerText: {fileID: 9702831}
   roundText: {fileID: 635971142}
   scoreManager: {fileID: 1505763}
@@ -192,6 +192,12 @@ MonoBehaviour:
   maxY: 3.5
   initialMinSize: 0.6
   initialMaxSize: 1.1
+  enableAutoDetector: 0
+  detectionCheckInterval: 1
+  colorSensitivity: 0.7
+  sizeSensitivity: 0.3
+  minDetectionChance: 0.02
+  maxDetectionChance: 0.55
 --- !u!114 &1505762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,7 +581,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.13725491, g: 0.27450982, b: 0.21568628, a: 0}
+  m_BackGroundColor: {r: 0.5963282, g: 0.6, b: 0.1490196, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -716,7 +722,11 @@ MonoBehaviour:
         m_SelectedSource:
           rid: -2
         m_Provider2DCache:
-          rid: -2
+          rid: 3611214526610145280
+    - rid: 3611214526610145280
+      type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider, Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
+      data:
+        m_Cache: []
 --- !u!4 &619394802
 Transform:
   m_ObjectHideFlags: 0

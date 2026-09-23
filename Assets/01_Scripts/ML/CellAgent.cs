@@ -12,8 +12,18 @@ public class CellAgent : Agent
     [SerializeField] private Camera mainCamera;
 
     [Header("Velocidad de adaptación")]
-    [SerializeField] private float colorChangeSpeed = 0.25f;
+    [Tooltip("Cada célula toma UNA sola decisión de color por ronda (al nacer). Este valor debe ser lo bastante grande (>=1) para que, en ese único paso, la red pueda llevar el color aleatorio inicial hasta cualquier punto del espacio RGB si así lo aprendió.")]
+    [SerializeField] private float colorChangeSpeed = 1.2f;
     [SerializeField] private float sizeChangeSpeed = 0.20f;
+
+    [Header("Recompensa por camuflaje (shaping)")]
+    [Tooltip("Recompensa pequeña y continua que empuja a la célula a parecerse al fondo, además del +1/-1 de sobrevivir o ser detectada. Ayuda a que el aprendizaje converja más rápido.")]
+    [SerializeField] private bool useRewardShaping = true;
+    [SerializeField] private float shapingWeight = 0.01f;
+
+    [Header("Depuración")]
+    [Tooltip("Si está activo, imprime en consola cada acción/paso. Desactívalo durante el entrenamiento real: con miles de pasos satura la consola y ralentiza todo.")]
+    [SerializeField] private bool verboseLogging = false;
 
     private Color backgroundColor;
     public Color BackgroundColor => backgroundColor;
@@ -42,9 +52,17 @@ public class CellAgent : Agent
     }
     public override void OnEpisodeBegin()
     {
-        // Por ahora no hacemos nada aquí.
-        // El CellSpawner será quien solicite
-        // la adaptación.
+        // Cada ronda es un episodio nuevo. La célula nace con un color
+        // aleatorio (asignado por el CellSpawner) y el CellSpawner pide
+        // UNA única decisión (RequestAdaptation) justo al crearla.
+        //
+        // A propósito NO volvemos a pedir decisiones durante la ronda:
+        // el camuflaje no debe verse "en vivo" cambiando de color mientras
+        // transcurre la ronda. Lo que sí mejora es la calidad de esa única
+        // decisión a medida que la red se entrena a lo largo de muchas
+        // rondas (episodios): con el tiempo, la política aprende a elegir
+        // mejor color/tamaño de entrada dado el color de fondo, aunque el
+        // punto de partida siga siendo aleatorio cada vez.
     }
 
     // OBSERVACIONES
@@ -120,17 +138,20 @@ public class CellAgent : Agent
                 1f
             );
 
-        Debug.Log(
-            gameObject.name +
-            " | ACCIONES -> R: " +
-            redAction.ToString("F2") +
-            " G: " +
-            greenAction.ToString("F2") +
-            " B: " +
-            blueAction.ToString("F2") +
-            " Size: " +
-            sizeAction.ToString("F2")
-        );
+        if (verboseLogging)
+        {
+            Debug.Log(
+                gameObject.name +
+                " | ACCIONES -> R: " +
+                redAction.ToString("F2") +
+                " G: " +
+                greenAction.ToString("F2") +
+                " B: " +
+                blueAction.ToString("F2") +
+                " Size: " +
+                sizeAction.ToString("F2")
+            );
+        }
 
         ApplyColorAction(
             redAction,
@@ -139,6 +160,29 @@ public class CellAgent : Agent
         );
 
         ApplySizeAction(sizeAction);
+
+        if (useRewardShaping)
+        {
+            ApplyCamouflageShaping();
+        }
+    }
+
+    // RECOMPENSA CONTINUA POR PARECERSE AL FONDO
+    private void ApplyCamouflageShaping()
+    {
+        Color cellColor = cell.CellColor;
+
+        float colorDistance =
+            Vector3.Distance(
+                new Vector3(cellColor.r, cellColor.g, cellColor.b),
+                new Vector3(backgroundColor.r, backgroundColor.g, backgroundColor.b)
+            );
+
+        // Distancia máxima posible entre dos colores RGB es sqrt(3).
+        float normalizedDistance = Mathf.Clamp01(colorDistance / 1.732f);
+
+        // Cuanto más lejos del color de fondo, mayor penalización (pequeña).
+        AddReward(-normalizedDistance * shapingWeight);
     }
     // CAMBIAR COLOR
 
@@ -150,11 +194,14 @@ public class CellAgent : Agent
         Color oldColor =
             cell.CellColor;
 
-        Color newColor = new Color(oldColor.r +redAction * colorChangeSpeed,oldColor.g +greenAction * colorChangeSpeed, oldColor.b + blueAction * colorChangeSpeed, 1f );
+        Color newColor = new Color(oldColor.r + redAction * colorChangeSpeed, oldColor.g + greenAction * colorChangeSpeed, oldColor.b + blueAction * colorChangeSpeed, 1f);
 
         cell.SetColor(newColor);
 
-        Debug.Log(gameObject.name +" | COLOR -> Antes: " +oldColor +" | Después: " +cell.CellColor);
+        if (verboseLogging)
+        {
+            Debug.Log(gameObject.name + " | COLOR -> Antes: " + oldColor + " | Después: " + cell.CellColor);
+        }
     }
     // CAMBIAR TAMAÑO
     private void ApplySizeAction(
@@ -169,7 +216,10 @@ public class CellAgent : Agent
 
         cell.SetSize(newSize);
 
-        Debug.Log(gameObject.name +" | SIZE -> Antes: " +oldSize.ToString("F2") +" | Después: " +cell.Size.ToString("F2"));
+        if (verboseLogging)
+        {
+            Debug.Log(gameObject.name + " | SIZE -> Antes: " + oldSize.ToString("F2") + " | Después: " + cell.Size.ToString("F2"));
+        }
     }
     // HEURISTIC
 
@@ -240,7 +290,7 @@ public class CellAgent : Agent
 
         if (TrainingMetrics.Instance != null)
         {
-            TrainingMetrics.Instance.RegisterSurvivor(cell.Size,cell.CellColor,backgroundColor);
+            TrainingMetrics.Instance.RegisterSurvivor(cell.Size, cell.CellColor, backgroundColor);
         }
 
         Debug.Log(

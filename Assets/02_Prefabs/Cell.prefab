@@ -70,8 +70,11 @@ MonoBehaviour:
   MaxStep: 0
   cell: {fileID: 0}
   mainCamera: {fileID: 0}
-  colorChangeSpeed: 0.05
+  colorChangeSpeed: 0.1
   sizeChangeSpeed: 0.05
+  useRewardShaping: 1
+  shapingWeight: 0.01
+  verboseLogging: 0
 --- !u!212 &3833751347430902151
 SpriteRenderer:
   serializedVersion: 3
@@ -190,12 +193,12 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 67543ec8e8a654b4ea9434112b749827, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CellBehavior
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
-  m_DeterministicInference: 0
+  m_DeterministicInference: 1
   m_ObservableAttributeHandling: 0
